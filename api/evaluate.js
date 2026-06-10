@@ -1,0 +1,30 @@
+export default async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  const { prompt } = req.body;
+  if (!prompt) return res.status(400).json({ error: 'Missing prompt' });
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.3,
+        max_tokens: 600
+      })
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      return res.status(response.status).json({ error: err.error?.message || 'OpenAI error' });
+    }
+    const data = await response.json();
+    let text = data.choices[0].message.content.trim().replace(/```json|```/g, '').trim();
+    const result = JSON.parse(text);
+    return res.status(200).json(result);
+  } catch(e) {
+    return res.status(500).json({ error: e.message });
+  }
+}
