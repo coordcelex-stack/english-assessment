@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Control — English Assessment</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Sora:wght@600;700&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --bg: #F8F9FC; --bg2: #fff; --border: #E5E7EF; --text: #1a1d2e; --muted: #6B7280; --accent: #6C63FF; --accent2: #4ECDC4; --success: #10B981; --danger: #EF4444; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  #login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .login-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; width: 100%; max-width: 400px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+  .login-card h2 { font-family: 'Sora', sans-serif; font-size: 1.4rem; margin-bottom: 0.5rem; }
+  .login-card p { font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 5px; font-weight: 500; }
+  input[type="password"] { width: 100%; padding: 11px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif; outline: none; color: var(--text); background: var(--bg); }
+  input:focus { border-color: var(--accent); }
+  .btn { padding: 11px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: none; transition: all 0.2s; }
+  .btn-primary { background: var(--accent); color: white; width: 100%; margin-top: 1rem; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+  .btn-outline:hover { background: var(--bg); }
+  .error-msg { background: #fef2f2; border: 1px solid #fecaca; color: var(--danger); padding: 9px 13px; border-radius: 7px; font-size: 13px; margin-top: 0.75rem; display: none; }
+  #dashboard { display: none; }
+  .topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .logo-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
+  .logo-text { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; }
+  .logo-text span { color: var(--muted); font-weight: 400; }
+  .badge-admin { background: rgba(108,99,255,0.1); color: var(--accent); font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .main { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 2rem; }
+  .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+  .stat-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .stat-num { font-family: 'Sora', sans-serif; font-size: 1.8rem; font-weight: 700; }
+  .stat-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .filters-row { display: flex; gap: 10px; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .filters-row input[type="text"] { flex: 1; min-width: 200px; padding: 9px 13px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; color: var(--text); background: var(--bg); }
+  .filters-row input:focus { border-color: var(--accent); }
+  select { padding: 9px 13px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; color: var(--text); background: var(--bg); cursor: pointer; }
+  .btn-export { background: var(--success); color: white; padding: 9px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: none; }
+  .btn-export:hover { opacity: 0.9; }
+  .table-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: var(--bg); }
+  th { padding: 11px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td { padding: 13px 16px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg); }
+  .level-pill { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+  .lvl-A1 { background: #fef2f2; color: #dc2626; } .lvl-A2 { background: #fffbeb; color: #d97706; }
+  .lvl-B1 { background: #f0fdfa; color: #0d9488; } .lvl-B2 { background: #f0eeff; color: #7c3aed; }
+  .lvl-C1, .lvl-C2 { background: #f0fdf4; color: #16a34a; }
+  .score-pill { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; background: var(--bg); border: 1px solid var(--border); }
+  .btn-detail { background: none; border: 1px solid var(--border); padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; font-family: 'Inter', sans-serif; color: var(--accent); }
+  .btn-detail:hover { background: rgba(108,99,255,0.08); }
+  .empty-state { text-align: center; padding: 4rem 2rem; color: var(--muted); }
+  .loading { text-align: center; padding: 3rem; color: var(--muted); font-size: 14px; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 100; padding: 1rem; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg2); border-radius: 16px; padding: 2rem; max-width: 600px; width: 100%; max-height: 85vh; overflow-y: auto; }
+  .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
+  .modal-header h3 { font-family: 'Sora', sans-serif; font-size: 1.1rem; }
+  .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--muted); }
+  .modal-section { margin-bottom: 1.25rem; }
+  .modal-section h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 8px; }
+  .modal-section p { font-size: 14px; line-height: 1.6; }
+  .qa-item { background: var(--bg); border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+  .qa-item .q { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .qa-item .a { font-size: 13px; line-height: 1.5; }
+  .scores-row { display: flex; gap: 10px; }
+  .sc { flex: 1; background: var(--bg); border-radius: 8px; padding: 10px; text-align: center; }
+  .sc .n { font-size: 1.3rem; font-weight: 700; color: var(--accent); }
+  .sc .l { font-size: 11px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-card">
+    <h2>🔐 Panel de Control</h2>
+    <p>Acceso exclusivo para administradores</p>
+    <div style="margin-bottom:1rem;">
+      <label>Contraseña de administrador</label>
+      <input type="password" id="input-password" placeholder="Ingresa la contraseña" />
+    </div>
+    <div class="error-msg" id="login-error">Contraseña incorrecta.</div>
+    <button class="btn btn-primary" id="btn-login">Entrar al panel</button>
+  </div>
+</div>
+
+<div id="dashboard">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="logo-dot"></div>
+      <div class="logo-text">English<span>Assessment</span></div>
+      <span class="badge-admin">Admin</span>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <span id="last-updated" style="font-size:12px;color:var(--muted);"></span>
+      <button class="btn btn-outline" id="btn-refresh" style="font-size:13px;padding:7px 14px;">↻ Actualizar</button>
+      <button class="btn btn-outline" id="btn-logout" style="font-size:13px;padding:7px 14px;">Salir</button>
+    </div>
+  </div>
+  <div class="main">
+    <div style="margin-bottom:1.5rem;">
+      <h2 style="font-family:'Sora',sans-serif;font-size:1.4rem;margin-bottom:4px;">Resultados de estudiantes</h2>
+      <p style="font-size:14px;color:var(--muted);">Todos los exámenes completados en tiempo real.</p>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Total estudiantes</div><div class="stat-num" id="stat-total">—</div></div>
+      <div class="stat-card"><div class="stat-label">Promedio fluency</div><div class="stat-num" id="stat-fluency">—</div><div class="stat-sub">de 10</div></div>
+      <div class="stat-card"><div class="stat-label">Promedio grammar</div><div class="stat-num" id="stat-grammar">—</div><div class="stat-sub">de 10</div></div>
+      <div class="stat-card"><div class="stat-label">Nivel más común</div><div class="stat-num" id="stat-common">—</div></div>
+    </div>
+    <div class="filters-row">
+      <input type="text" id="search-input" placeholder="🔍 Buscar por nombre o email..." />
+      <select id="filter-level">
+        <option value="">Todos los niveles</option>
+        <option value="A1">A1</option><option value="A2">A2</option>
+        <option value="B1">B1</option><option value="B2">B2</option><option value="C1">C1</option>
+      </select>
+      <button class="btn-export" id="btn-export">⬇ Exportar Excel</button>
+    </div>
+    <div class="table-wrap">
+      <div class="loading" id="loading-msg">Cargando resultados...</div>
+      <table id="results-table" style="display:none;">
+        <thead><tr><th>#</th><th>Nombre</th><th>Email</th><th>Nivel</th><th>Fluency</th><th>Grammar</th><th>Vocab</th><th>Fecha</th><th></th></tr></thead>
+        <tbody id="results-tbody"></tbody>
+      </table>
+      <div class="empty-state" id="empty-state" style="display:none;">
+        <p>No hay resultados aún</p>
+        <span style="font-size:13px;">Los exámenes completados aparecerán aquí automáticamente.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-name">Estudiante</h3>
+      <button class="modal-close" id="modal-close">✕</button>
+    </div>
+    <div class="scores-row" style="margin-bottom:1.25rem;">
+      <div class="sc"><div class="n" id="m-fluency">—</div><div class="l">Fluency</div></div>
+      <div class="sc"><div class="n" id="m-grammar">—</div><div class="l">Grammar</div></div>
+      <div class="sc"><div class="n" id="m-vocab">—</div><div class="l">Vocabulary</div></div>
+    </div>
+    <div class="modal-section"><h4>Feedback general</h4><p id="m-overall"></p></div>
+    <div class="modal-section"><h4>Respuestas del examen</h4><div id="m-answers"></div></div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAfDb9wMQWB6HCU1qDWdeev8b1c8sEXgZo",
+  authDomain: "english-assessment-ddfa9.firebaseapp.com",
+  projectId: "english-assessment-ddfa9",
+  storageBucket: "english-assessment-ddfa9.firebasestorage.app",
+  messagingSenderId: "811779470904",
+  appId: "1:811779470904:web:4939c948e6e9d35d7618cd"
+};
+
+const ADMIN_PASSWORD = "CentroLenguas2025";
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+let allResults = [];
+const $ = id => document.getElementById(id);
+
+$('btn-login').addEventListener('click', () => {
+  if ($('input-password').value === ADMIN_PASSWORD) {
+    $('login-screen').style.display = 'none';
+    $('dashboard').style.display = 'block';
+    loadResults();
+  } else { $('login-error').style.display = 'block'; }
+});
+$('input-password').addEventListener('keydown', e => { if (e.key==='Enter') $('btn-login').click(); });
+$('btn-logout').addEventListener('click', () => location.reload());
+$('btn-refresh').addEventListener('click', loadResults);
+
+async function loadResults() {
+  $('loading-msg').style.display = 'block';
+  $('results-table').style.display = 'none';
+  $('empty-state').style.display = 'none';
+  try {
+    const q = query(collection(db, 'results'), orderBy('date', 'desc'));
+    const snap = await getDocs(q);
+    allResults = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    $('last-updated').textContent = 'Actualizado: ' + new Date().toLocaleTimeString('es-MX');
+    renderStats(allResults); renderTable(allResults);
+  } catch(e) { $('loading-msg').textContent = 'Error: ' + e.message; }
+}
+
+function renderStats(data) {
+  $('stat-total').textContent = data.length;
+  if (!data.length) { $('stat-fluency').textContent='—'; $('stat-grammar').textContent='—'; $('stat-common').textContent='—'; return; }
+  $('stat-fluency').textContent = (data.reduce((s,r)=>s+(r.fluency||0),0)/data.length).toFixed(1);
+  $('stat-grammar').textContent = (data.reduce((s,r)=>s+(r.grammar||0),0)/data.length).toFixed(1);
+  const levels = data.reduce((acc,r)=>{ acc[r.level]=(acc[r.level]||0)+1; return acc; },{});
+  const common = Object.entries(levels).sort((a,b)=>b[1]-a[1])[0];
+  $('stat-common').textContent = common ? common[0] : '—';
+}
+
+function renderTable(data) {
+  $('loading-msg').style.display = 'none';
+  if (!data.length) { $('empty-state').style.display='block'; return; }
+  $('results-table').style.display = 'table';
+  const tbody = $('results-tbody'); tbody.innerHTML = '';
+  data.forEach((r,i) => {
+    const date = r.date?.toDate ? r.date.toDate().toLocaleDateString('es-MX') : '—';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td style="color:var(--muted);font-size:12px;">${i+1}</td><td style="font-weight:500;">${r.name||'—'}</td><td style="color:var(--muted);font-size:12px;">${r.email||'—'}</td><td><span class="level-pill lvl-${r.level}">${r.level}</span></td><td><span class="score-pill">${r.fluency}/10</span></td><td><span class="score-pill">${r.grammar}/10</span></td><td><span class="score-pill">${r.vocabulary}/10</span></td><td style="color:var(--muted);font-size:12px;">${date}</td><td><button class="btn-detail" data-id="${r.id}">Ver detalle</button></td>`;
+    tbody.appendChild(tr);
+  });
+  document.querySelectorAll('.btn-detail').forEach(btn => {
+    btn.addEventListener('click', () => { const r=allResults.find(x=>x.id===btn.dataset.id); if(r) openModal(r); });
+  });
+}
+
+$('search-input').addEventListener('input', applyFilters);
+$('filter-level').addEventListener('change', applyFilters);
+function applyFilters() {
+  const s=$('search-input').value.toLowerCase(), l=$('filter-level').value;
+  renderTable(allResults.filter(r=>(!s||(r.name||'').toLowerCase().includes(s)||(r.email||'').toLowerCase().includes(s))&&(!l||r.level===l)));
+}
+
+function openModal(r) {
+  $('modal-name').textContent = `${r.name} — ${r.level} ${r.levelName}`;
+  $('m-fluency').textContent=`${r.fluency}/10`; $('m-grammar').textContent=`${r.grammar}/10`; $('m-vocab').textContent=`${r.vocabulary}/10`;
+  $('m-overall').textContent = r.overall||'—';
+  const el=$('m-answers'); el.innerHTML='';
+  (r.answers||[]).forEach((a,i)=>{ const d=document.createElement('div'); d.className='qa-item'; d.innerHTML=`<div class="q">P${i+1}: ${a.question}</div><div class="a">${a.answer}</div>`; el.appendChild(d); });
+  $('modal').classList.add('open');
+}
+$('modal-close').addEventListener('click', ()=>$('modal').classList.remove('open'));
+$('modal').addEventListener('click', e=>{ if(e.target===$('modal')) $('modal').classList.remove('open'); });
+
+$('btn-export').addEventListener('click', () => {
+  if (!allResults.length) { alert('No hay datos para exportar.'); return; }
+  const headers=['Nombre','Email','Nivel','Level Name','Fluency','Grammar','Vocabulary','Feedback','Fecha'];
+  const rows=allResults.map(r=>[r.name,r.email,r.level,r.levelName,r.fluency,r.grammar,r.vocabulary,r.overall,r.date?.toDate?r.date.toDate().toLocaleDateString('es-MX'):'']);
+  const csv=[headers,...rows].map(row=>row.map(c=>`"${(c||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=`resultados-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+});
+</script>
+</body>
+</html>

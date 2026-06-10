@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Speaking Assessment</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Sora:wght@400;600;700&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0F1117; --bg2: #171B26; --bg3: #1E2433;
+    --border: rgba(255,255,255,0.08); --text: #F0F2F8; --muted: #8B90A0;
+    --accent: #6C63FF; --accent2: #4ECDC4; --success: #2ECC71; --danger: #E74C3C;
+  }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+  .header { width: 100%; padding: 1.25rem 2rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+  .logo-text { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 600; }
+  .logo-text span { color: var(--muted); font-weight: 400; }
+  .main { width: 100%; max-width: 680px; padding: 2.5rem 1.5rem; flex: 1; }
+  .hero-label { font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; }
+  h1 { font-family: 'Sora', sans-serif; font-size: 2.2rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.8px; margin-bottom: 0.75rem; }
+  .subtitle { font-size: 15px; color: var(--muted); line-height: 1.6; margin-bottom: 2rem; }
+  .levels-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 2.5rem; }
+  .level-badge { padding: 4px 12px; border-radius: 20px; border: 1px solid var(--accent); font-size: 12px; font-weight: 500; color: var(--accent); background: rgba(108,99,255,0.1); }
+  .field-group { margin-bottom: 1.25rem; }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+  input[type="text"], input[type="email"] { width: 100%; padding: 12px 16px; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 15px; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.2s; }
+  input:focus { border-color: var(--accent); }
+  .btn-primary { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; margin-top: 1.5rem; transition: opacity 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  #assessment-screen, #results-screen { display: none; animation: fadeIn 0.4s ease; }
+  .progress-bar-wrap { background: var(--bg3); border-radius: 4px; height: 4px; margin-bottom: 2rem; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 4px; transition: width 0.6s ease; }
+  .question-counter { font-size: 12px; color: var(--muted); margin-bottom: 0.5rem; display: flex; justify-content: space-between; }
+  .question-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 1.75rem; margin-bottom: 1.5rem; }
+  .question-box p { font-size: 18px; line-height: 1.5; }
+  .mic-area { display: flex; flex-direction: column; align-items: center; gap: 1rem; margin: 2rem 0; }
+  .mic-btn { width: 80px; height: 80px; border-radius: 50%; background: var(--bg2); border: 2px solid var(--border); color: var(--text); font-size: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .mic-btn.recording { border-color: var(--danger); background: rgba(231,76,60,0.1); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(231,76,60,0.4); } 50% { box-shadow: 0 0 0 12px rgba(231,76,60,0); } }
+  .mic-status { font-size: 13px; color: var(--muted); text-align: center; }
+  .transcript-box { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; font-size: 14px; color: var(--text); line-height: 1.6; min-height: 60px; width: 100%; margin-bottom: 1rem; }
+  .transcript-box.empty { color: var(--muted); font-style: italic; }
+  .btn-send { width: 100%; padding: 13px; background: var(--bg2); border: 1px solid var(--accent); color: var(--accent); border-radius: 10px; font-size: 14px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s; }
+  .btn-send:hover { background: rgba(108,99,255,0.1); }
+  .btn-send:disabled { opacity: 0.4; cursor: not-allowed; }
+  .result-hero { text-align: center; padding: 2rem 0; }
+  .cefr-badge { display: inline-flex; align-items: center; gap: 10px; padding: 10px 24px; border-radius: 30px; font-family: 'Sora', sans-serif; font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
+  .cefr-A1 { background: rgba(231,76,60,0.15); color: #E74C3C; border: 1px solid rgba(231,76,60,0.3); }
+  .cefr-A2 { background: rgba(243,156,18,0.15); color: #F39C12; border: 1px solid rgba(243,156,18,0.3); }
+  .cefr-B1 { background: rgba(78,205,196,0.15); color: #4ECDC4; border: 1px solid rgba(78,205,196,0.3); }
+  .cefr-B2 { background: rgba(108,99,255,0.15); color: #6C63FF; border: 1px solid rgba(108,99,255,0.3); }
+  .cefr-C1, .cefr-C2 { background: rgba(46,204,113,0.15); color: #2ECC71; border: 1px solid rgba(46,204,113,0.3); }
+  .result-hero p { font-size: 15px; color: var(--muted); max-width: 400px; margin: 0 auto; line-height: 1.6; }
+  .scores-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 1.5rem 0; }
+  .score-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; text-align: center; }
+  .score-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .score-num { font-family: 'Sora', sans-serif; font-size: 2rem; font-weight: 700; line-height: 1; }
+  .score-num span { font-size: 13px; color: var(--muted); font-family: 'Inter', sans-serif; font-weight: 400; }
+  .score-bar { height: 3px; background: var(--bg3); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+  .score-bar-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
+  .feedback-section { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem; }
+  .feedback-section h3 { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; margin-bottom: 0.75rem; color: var(--accent2); }
+  .feedback-section p { font-size: 14px; line-height: 1.7; color: var(--muted); }
+  .feedback-section ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .feedback-section li { font-size: 14px; color: var(--muted); padding-left: 1.2rem; position: relative; }
+  .feedback-section li::before { content: '→'; position: absolute; left: 0; color: var(--accent); }
+  .saved-msg { background: rgba(46,204,113,0.1); border: 1px solid rgba(46,204,113,0.3); color: #2ECC71; padding: 12px 16px; border-radius: 10px; font-size: 13px; text-align: center; margin-bottom: 1rem; display: none; }
+  .btn-restart { width: 100%; padding: 14px; background: transparent; border: 1px solid var(--border); color: var(--text); border-radius: 10px; font-size: 14px; font-weight: 500; font-family: 'Inter', sans-serif; cursor: pointer; margin-top: 0.75rem; transition: background 0.2s; }
+  .btn-restart:hover { background: var(--bg2); }
+  .error-msg { background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.3); color: #E74C3C; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-top: 0.75rem; display: none; }
+  .thinking-dots span { display: inline-block; animation: blink 1.4s infinite; }
+  .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,80%,100% { opacity: 0; } 40% { opacity: 1; } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @media (max-width: 480px) { h1 { font-size: 1.7rem; } .scores-grid { grid-template-columns: 1fr 1fr; } .main { padding: 1.5rem 1rem; } }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo-dot"></div>
+  <div class="logo-text">English<span>Assessment</span></div>
+</div>
+<div class="main">
+  <div id="setup-screen">
+    <p class="hero-label">Speaking Diagnostic</p>
+    <h1>How's your English?</h1>
+    <p class="subtitle">Speak naturally and get an instant CEFR level report. Takes about 5 minutes.</p>
+    <div class="levels-row">
+      <span class="level-badge">A1</span><span class="level-badge">A2</span>
+      <span class="level-badge">B1</span><span class="level-badge">B2</span><span class="level-badge">C1</span>
+    </div>
+    <div class="field-group">
+      <label>Your full name</label>
+      <input type="text" id="input-name" placeholder="e.g. María García" />
+    </div>
+    <div class="field-group">
+      <label>Your email</label>
+      <input type="email" id="input-email" placeholder="maria@email.com" />
+    </div>
+    <div class="error-msg" id="setup-error"></div>
+    <button class="btn-primary" id="btn-start">🎤 Start assessment</button>
+  </div>
+
+  <div id="assessment-screen">
+    <div class="question-counter">
+      <span id="q-counter">Question 1 of 6</span>
+      <span id="q-topic" style="color: var(--accent); font-size: 12px;"></span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div>
+    </div>
+    <div class="question-box"><p id="question-text">Loading...</p></div>
+    <div class="mic-area">
+      <button class="mic-btn" id="mic-btn">🎤</button>
+      <p class="mic-status" id="mic-status">Press and hold to speak</p>
+    </div>
+    <div class="transcript-box empty" id="transcript-display">Your speech will appear here...</div>
+    <button class="btn-send" id="btn-submit" disabled>Send answer →</button>
+    <div class="error-msg" id="assessment-error"></div>
+  </div>
+
+  <div id="results-screen">
+    <div class="result-hero">
+      <div class="cefr-badge" id="cefr-badge">...</div>
+      <h1 id="result-title" style="font-size: 1.4rem; margin-bottom: 0.5rem;"></h1>
+      <p id="result-desc"></p>
+    </div>
+    <div class="scores-grid">
+      <div class="score-card">
+        <div class="score-label">Fluency</div>
+        <div class="score-num" id="score-fluency">—<span>/10</span></div>
+        <div class="score-bar"><div class="score-bar-fill" id="bar-fluency" style="width:0%;background:var(--accent)"></div></div>
+      </div>
+      <div class="score-card">
+        <div class="score-label">Grammar</div>
+        <div class="score-num" id="score-grammar">—<span>/10</span></div>
+        <div class="score-bar"><div class="score-bar-fill" id="bar-grammar" style="width:0%;background:var(--accent2)"></div></div>
+      </div>
+      <div class="score-card">
+        <div class="score-label">Vocabulary</div>
+        <div class="score-num" id="score-vocab">—<span>/10</span></div>
+        <div class="score-bar"><div class="score-bar-fill" id="bar-vocab" style="width:0%;background:var(--success)"></div></div>
+      </div>
+    </div>
+    <div class="saved-msg" id="saved-msg">✅ Your results have been saved successfully.</div>
+    <div class="feedback-section"><h3>Overall feedback</h3><p id="feedback-overall"></p></div>
+    <div class="feedback-section"><h3>Strengths</h3><ul id="feedback-strengths"></ul></div>
+    <div class="feedback-section"><h3>Areas to improve</h3><ul id="feedback-improve"></ul></div>
+    <button class="btn-restart" id="btn-restart">Start a new assessment</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAfDb9wMQWB6HCU1qDWdeev8b1c8sEXgZo",
+  authDomain: "english-assessment-ddfa9.firebaseapp.com",
+  projectId: "english-assessment-ddfa9",
+  storageBucket: "english-assessment-ddfa9.firebasestorage.app",
+  messagingSenderId: "811779470904",
+  appId: "1:811779470904:web:4939c948e6e9d35d7618cd"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+
+const QUESTIONS = [
+  { topic: "Introduction", q: "Tell me a little about yourself — your name, where you're from, and what you do." },
+  { topic: "Daily life", q: "Describe your typical day, from when you wake up to when you go to sleep." },
+  { topic: "Opinion", q: "Do you prefer living in a city or in the countryside? Explain why." },
+  { topic: "Experience", q: "Tell me about a trip or journey you remember well. What happened and how did you feel?" },
+  { topic: "Future plans", q: "What are your goals for the next two years? What steps are you taking to reach them?" },
+  { topic: "Abstract thinking", q: "How has technology changed the way people communicate? Is it mostly positive or negative?" }
+];
+
+let currentQ = 0, answers = [], recognition = null, isRecording = false, transcript = '';
+let studentName = '', studentEmail = '';
+
+const $ = id => document.getElementById(id);
+function showError(id, msg) { const el=$(id); el.textContent=msg; el.style.display='block'; }
+
+$('btn-start').addEventListener('click', () => {
+  studentName = $('input-name').value.trim();
+  studentEmail = $('input-email').value.trim();
+  if (!studentName) { showError('setup-error', 'Please enter your name.'); return; }
+  if (!studentEmail || !studentEmail.includes('@')) { showError('setup-error', 'Please enter a valid email.'); return; }
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    showError('setup-error', 'Please use Chrome or Edge for microphone support.'); return;
+  }
+  $('setup-screen').style.display = 'none';
+  $('assessment-screen').style.display = 'block';
+  loadQuestion(0);
+});
+
+function loadQuestion(idx) {
+  currentQ = idx;
+  const q = QUESTIONS[idx];
+  $('q-counter').textContent = `Question ${idx+1} of ${QUESTIONS.length}`;
+  $('q-topic').textContent = q.topic;
+  $('question-text').textContent = q.q;
+  $('progress-fill').style.width = `${(idx/QUESTIONS.length)*100}%`;
+  $('transcript-display').textContent = 'Your speech will appear here...';
+  $('transcript-display').classList.add('empty');
+  $('btn-submit').disabled = true;
+  $('assessment-error').style.display = 'none';
+  transcript = '';
+}
+
+function setupRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang = 'en-US'; recognition.continuous = true; recognition.interimResults = true;
+  recognition.onresult = (e) => {
+    let final = '', interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript + ' ';
+      else interim += e.results[i][0].transcript;
+    }
+    transcript += final;
+    const display = transcript + interim;
+    if (display.trim()) {
+      $('transcript-display').textContent = display;
+      $('transcript-display').classList.remove('empty');
+      $('btn-submit').disabled = false;
+    }
+  };
+  recognition.onerror = (e) => {
+    if (e.error !== 'aborted') showError('assessment-error', `Mic error: ${e.error}. Allow microphone access.`);
+    stopRecording();
+  };
+}
+
+const micBtn = $('mic-btn');
+micBtn.addEventListener('mousedown', startRecording);
+micBtn.addEventListener('mouseup', stopRecording);
+micBtn.addEventListener('touchstart', e => { e.preventDefault(); startRecording(); });
+micBtn.addEventListener('touchend', e => { e.preventDefault(); stopRecording(); });
+
+function startRecording() {
+  if (isRecording) return;
+  isRecording = true; setupRecognition(); recognition.start();
+  micBtn.classList.add('recording'); micBtn.textContent = '⏹';
+  $('mic-status').textContent = 'Recording… release when done';
+}
+function stopRecording() {
+  if (!isRecording) return;
+  isRecording = false; recognition.stop();
+  micBtn.classList.remove('recording'); micBtn.textContent = '🎤';
+  $('mic-status').textContent = 'Press and hold to speak again';
+}
+
+$('btn-submit').addEventListener('click', async () => {
+  if (!transcript.trim()) return;
+  answers.push({ question: QUESTIONS[currentQ].q, answer: transcript.trim() });
+  if (currentQ < QUESTIONS.length - 1) {
+    loadQuestion(currentQ + 1);
+  } else {
+    $('assessment-screen').style.display = 'none';
+    $('results-screen').style.display = 'block';
+    $('saved-msg').style.display = 'none';
+    $('cefr-badge').textContent = '⏳ Analyzing...';
+    $('feedback-overall').innerHTML = '<span class="thinking-dots"><span>•</span><span>•</span><span>•</span></span>';
+    await evaluateWithGPT();
+  }
+});
+
+async function evaluateWithGPT() {
+  const conversation = answers.map((a,i) => `Q${i+1}: ${a.question}\nAnswer: ${a.answer}`).join('\n\n');
+  const prompt = `You are an expert English language examiner. Evaluate these spoken English responses and provide a CEFR level assessment.
+Student: ${studentName}
+Responses:
+${conversation}
+Respond ONLY with a valid JSON object (no markdown, no backticks):
+{"level":"B1","levelName":"Intermediate","levelDesc":"One sentence describing what they can do","fluency":6,"grammar":7,"vocabulary":6,"overall":"2-3 sentences of overall feedback","strengths":["strength 1","strength 2","strength 3"],"improve":["improvement 1","improvement 2","improvement 3"]}
+level must be A1, A2, B1, B2, or C1. Scores are integers 1-10.`;
+
+  try {
+    const res = await fetch('/api/evaluate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    if (!res.ok) { const err = await res.json(); throw new Error(err.error || `Error ${res.status}`); }
+    const result = await res.json();
+    renderResults(result);
+    await saveToFirebase(result);
+  } catch(e) {
+    $('cefr-badge').textContent = 'Error';
+    $('feedback-overall').textContent = `Error: ${e.message}`;
+  }
+}
+
+function renderResults(r) {
+  const badge = $('cefr-badge');
+  badge.textContent = `${r.level} — ${r.levelName}`;
+  badge.className = `cefr-badge cefr-${r.level}`;
+  $('result-title').textContent = r.levelName;
+  $('result-desc').textContent = r.levelDesc;
+  $('score-fluency').innerHTML = `${r.fluency}<span>/10</span>`;
+  $('score-grammar').innerHTML = `${r.grammar}<span>/10</span>`;
+  $('score-vocab').innerHTML = `${r.vocabulary}<span>/10</span>`;
+  setTimeout(() => {
+    $('bar-fluency').style.width = `${r.fluency*10}%`;
+    $('bar-grammar').style.width = `${r.grammar*10}%`;
+    $('bar-vocab').style.width = `${r.vocabulary*10}%`;
+  }, 300);
+  $('feedback-overall').textContent = r.overall;
+  const sEl = $('feedback-strengths'); sEl.innerHTML = '';
+  (r.strengths||[]).forEach(s => { const li=document.createElement('li'); li.textContent=s; sEl.appendChild(li); });
+  const iEl = $('feedback-improve'); iEl.innerHTML = '';
+  (r.improve||[]).forEach(s => { const li=document.createElement('li'); li.textContent=s; iEl.appendChild(li); });
+}
+
+async function saveToFirebase(result) {
+  try {
+    await addDoc(collection(db, 'results'), {
+      name: studentName, email: studentEmail,
+      level: result.level, levelName: result.levelName,
+      fluency: result.fluency, grammar: result.grammar, vocabulary: result.vocabulary,
+      overall: result.overall, strengths: result.strengths, improve: result.improve,
+      answers: answers, date: serverTimestamp()
+    });
+    $('saved-msg').style.display = 'block';
+  } catch(e) { console.error('Firebase save error:', e); }
+}
+
+$('btn-restart').addEventListener('click', () => {
+  answers = []; currentQ = 0; transcript = '';
+  $('results-screen').style.display = 'none';
+  $('setup-screen').style.display = 'block';
+  $('input-name').value = ''; $('input-email').value = '';
+});
+</script>
+</body>
+</html>
