@@ -238,22 +238,20 @@ function setupRecognition() {
 }
 
 const micBtn = $('mic-btn');
-micBtn.addEventListener('mousedown', startRecording);
-micBtn.addEventListener('mouseup', stopRecording);
-micBtn.addEventListener('touchstart', e => { e.preventDefault(); startRecording(); });
-micBtn.addEventListener('touchend', e => { e.preventDefault(); stopRecording(); });
+micBtn.addEventListener("click", toggleRecording);
 
+function toggleRecording() { if (!isRecording) { startRecording(); } else { stopRecording(); } }
 function startRecording() {
-  if (isRecording) return;
+  
   isRecording = true; setupRecognition(); recognition.start();
   micBtn.classList.add('recording'); micBtn.textContent = '⏹';
-  $('mic-status').textContent = 'Recording… release when done';
+  $('mic-status').textContent = 'Recording… click again to stop';
 }
 function stopRecording() {
-  if (!isRecording) return;
+  
   isRecording = false; recognition.stop();
   micBtn.classList.remove('recording'); micBtn.textContent = '🎤';
-  $('mic-status').textContent = 'Press and hold to speak again';
+  $('mic-status').textContent = 'Click to speak again';
 }
 
 $('btn-submit').addEventListener('click', async () => {
